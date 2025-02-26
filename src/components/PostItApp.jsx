@@ -9,14 +9,14 @@ const DEFAULT_NOTE_SIZE = {
 const STORAGE_KEY = 'postit-notes';
 
 const PostItApp = () => {
-  
-  const [editingId, setEditingId] = useState(null);
-  const [draggedNote, setDraggedNote] = useState(null);
-  const [resizingNote, setResizingNote] = useState(null);
-  const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-  const [startSize, setStartSize] = useState(DEFAULT_NOTE_SIZE);
+  // Estados para manejar la edición, arrastre y redimensionamiento de notas
+  const [editingId, setEditingId] = useState(null);       // ID de la nota que se está editando
+  const [draggedNote, setDraggedNote] = useState(null);   // ID de la nota que se está editando
+  const [resizingNote, setResizingNote] = useState(null); // Nota que se está redimensionando
+  const [startPos, setStartPos] = useState({ x: 0, y: 0 });// Posición inicial para arrastre/redimensionamiento
+  const [startSize, setStartSize] = useState(DEFAULT_NOTE_SIZE);// Tamaño inicial para redimensionamiento
 
-  // Load notes from localStorage on initial render
+  // Cargar notas desde localStorage al iniciar la aplicación
  
     const [notes, setNotes] = useState(() => {
         try {
@@ -29,7 +29,7 @@ const PostItApp = () => {
         }
         return [];
       });
-  // Save notes to localStorage whenever they change
+  // Guardar notas en localStorage cada vez que cambien
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(notes));
@@ -38,12 +38,17 @@ const PostItApp = () => {
     }
   }, [notes]);
 
+
+  // Efecto para manejar el arrastre y redimensionamiento de notas
   useEffect(() => {
+    // Función para manejar el movimiento del ratón durante el arrastre/redimensionamiento
     const handleMouseMove = (e) => {
       if (draggedNote) {
+        // Calcular el desplazamiento desde la posición inicial
         const dx = e.clientX - startPos.x;
         const dy = e.clientY - startPos.y;
         
+        // Actualizar la posición de la nota arrastrada, manteniéndola dentro de los límites de la ventana
         setNotes(notes.map(note => 
           note.id === draggedNote.id 
             ? {
@@ -58,9 +63,11 @@ const PostItApp = () => {
       }
       
       if (resizingNote) {
+        // Calcular el cambio de tamaño desde el inicio del redimensionamiento
         const dx = e.clientX - startPos.x;
         const dy = e.clientY - startPos.y;
         
+        // Actualizar el tamaño de la nota, manteniéndolo dentro de límites 
         setNotes(notes.map(note =>
           note.id === resizingNote.id
             ? {
@@ -75,22 +82,27 @@ const PostItApp = () => {
       }
     };
 
+
+    // Función para manejar cuando se suelta el ratón
     const handleMouseUp = () => {
       setDraggedNote(null);
       setResizingNote(null);
     };
 
+    // Agregar event listeners solo cuando se está arrastrando o redimensionando
     if (draggedNote || resizingNote) {
       document.addEventListener('mousemove', handleMouseMove);
       document.addEventListener('mouseup', handleMouseUp);
     }
 
+    // Limpieza de event listeners
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
       document.removeEventListener('mouseup', handleMouseUp);
     };
   }, [draggedNote, resizingNote, startPos, startSize, notes]);
 
+  // Genera una posición aleatoria para nuevas notas
   const getRandomPosition = () => {
     const maxWidth = window.innerWidth - DEFAULT_NOTE_SIZE.width;
     const maxHeight = window.innerHeight - DEFAULT_NOTE_SIZE.height;
@@ -100,6 +112,7 @@ const PostItApp = () => {
     };
   };
 
+  // Crear una nueva nota
   const createNote = () => {
     const position = getRandomPosition();
     const newNote = {
@@ -115,6 +128,7 @@ const PostItApp = () => {
     setEditingId(newNote.id);
   };
 
+  // Actualizar el contenido de una nota
   const updateNote = (id, content) => {
     console.log('Updating note:', id, content);
     setNotes(prevNotes => 
@@ -125,11 +139,13 @@ const PostItApp = () => {
     setEditingId(null);
   };
 
+  // Eliminar una nota
   const deleteNote = (id) => {
     console.log('Deleting note:', id);
     setNotes(prevNotes => prevNotes.filter(note => note.id !== id));
   };
 
+  // Obtener un color aleatorio para las notas
   const getRandomColor = () => {
     const colors = [
       'bg-yellow-100',
@@ -141,6 +157,7 @@ const PostItApp = () => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+  // Iniciar el arrastre de una nota
   const handleDragStart = (note, e) => {
     if (e.target.classList.contains('handle')) {
       setDraggedNote({
@@ -151,6 +168,7 @@ const PostItApp = () => {
     }
   };
 
+  // Iniciar el redimensionamiento de una nota
   const handleResizeStart = (note, e) => {
     e.stopPropagation();
     setResizingNote({ id: note.id });
