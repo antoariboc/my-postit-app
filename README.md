@@ -3,7 +3,8 @@
 ## Guía para correr el proyecto
 En Ubuntu, abrir el terminal y comprobar que node está instalado escribiendo `node` y dandole a **enter**.  
 Si no esta instalado:
-- Hacer `sudo apt update`, y después `sudo apt install nodejs npm`.  
+- Hacer `sudo apt update`, y después `sudo apt install nodejs npm`.
+  
 A continuación nos situamos en el directorio en el que hayamos hecho clone del github, 
 o donde hayamos descomprimido el .zip.  
 Una vez que estamos en el directorio **my-postit-app** realizar `npm install` para instalar las dependencias.  
